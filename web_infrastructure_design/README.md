@@ -1,4 +1,4 @@
-✅ File: 0-simple_web_stack
+File: 0-simple_web_stack
 Scenario:
 A user wants to visit www.foobar.com.
 How it works:
@@ -26,7 +26,7 @@ Single Point of Failure (SPOF): If the server fails, the website is down.
 Downtime During Maintenance: Restarting Nginx or updating code causes service interruption.
 Scalability: Can’t handle high traffic loads.
 
-✅ File: 1-distributed_web_infrastructure
+File: 1-distributed_web_infrastructure
 Scenario:
 A more resilient infrastructure with load balancing and two web servers.
 
@@ -51,7 +51,7 @@ SPOF: HAProxy itself can be a single point of failure.
 No Firewalls/HTTPS: Vulnerable to attacks.
 No Monitoring: No visibility into server health.
 
-✅ File: 2-secured_and_monitored_web_infrastructure
+File: 2-secured_and_monitored_web_infrastructure
 Added Components:
 
 3 Firewalls:
@@ -80,7 +80,7 @@ Traffic between LB and backend may be unencrypted unless re-encrypted.
 One MySQL write node: Still a bottleneck and SPOF.
 Identical Components on All Servers: Inefficient and complicates scaling.
 
-✅ File: 3-scale_up
+File: 3-scale_up
 Goal:
 A modular and scalable infrastructure.
 
