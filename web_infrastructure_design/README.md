@@ -1,105 +1,74 @@
-File: 0-simple_web_stack
-Scenario:
-A user wants to visit www.foobar.com.
-How it works:
-The user types www.foobar.com in their browser.
-DNS resolves the domain using a DNS A record that maps www.foobar.com to IP address 8.8.8.8.
-The request is sent to the server at 8.8.8.8.
-
-Server Components:
-Web Server (Nginx): Accepts the HTTP request and forwards it to the application server.
-Application Server: Runs the website's backend code (e.g., PHP, Python).
-Application Files: Codebase that contains business logic and serves dynamic content.
-MySQL Database: Stores persistent data (e.g., user data, blog posts).
-
-Communication Protocol: The server and user’s computer communicate via HTTP.
-Key Concepts:
-What is a server? A physical or virtual computer that runs services to serve client requests.
-Domain Name: A human-readable address mapped to a server’s IP.
-DNS Record Type: www is a subdomain using an A record to map to the server IP.
-Web Server Role: Handles HTTP requests and forwards them.
-App Server Role: Processes logic and interacts with the database.
-Database Role: Stores and retrieves structured data.
-
-Issues:
-Single Point of Failure (SPOF): If the server fails, the website is down.
-Downtime During Maintenance: Restarting Nginx or updating code causes service interruption.
-Scalability: Can’t handle high traffic loads.
-
-File: 1-distributed_web_infrastructure
-Scenario:
-A more resilient infrastructure with load balancing and two web servers.
-
-Components:
-HAProxy Load Balancer: Distributes traffic to the backend servers. Uses a Round-Robin algorithm (rotates requests evenly).
-Active-Active setup: Both backend servers are active and handle traffic simultaneously.
-2 Web Servers (with same stack): Nginx + App Server + App Files + MySQL
-
-Database Setup:
-Primary-Replica (Master-Slave) configuration:
-Primary Node: Accepts writes and reads.
-Replica Node: Only used for read queries to reduce load on the primary.
-
-Purpose of Additional Components:
-HAProxy: Increases availability and balances traffic.
-Multiple Servers: Improves redundancy and scalability.
-Primary-Replica DB: Enables load distribution for queries and backups.
-
-Issues:
-
-SPOF: HAProxy itself can be a single point of failure.
-No Firewalls/HTTPS: Vulnerable to attacks.
-No Monitoring: No visibility into server health.
-
-File: 2-secured_and_monitored_web_infrastructure
-Added Components:
-
-3 Firewalls:
-One on each server to filter traffic (web, app, db).
-Only allow necessary ports (e.g., 80, 443, 3306).
-
-1 SSL Certificate:
-Encrypts traffic between client and server using HTTPS.
-Improves security and privacy.
-
-3 Monitoring Clients:
-Installed on each server.
-Send metrics to a centralized monitoring service like SumoLogic.
-Track metrics like CPU usage, response time, QPS (Queries per Second).
-
-Purpose:
-Firewalls: Prevent unauthorized access to servers.
-HTTPS: Encrypts data in transit to prevent eavesdropping.
-Monitoring: Alerts admins to failures or unusual behavior.
-Monitoring QPS: Collect Nginx logs.
-Use the monitoring tool to parse logs and extract QPS metrics.
-
-Issues:
-SSL Termination at Load Balancer:
-Traffic between LB and backend may be unencrypted unless re-encrypted.
-One MySQL write node: Still a bottleneck and SPOF.
-Identical Components on All Servers: Inefficient and complicates scaling.
-
-File: 3-scale_up
-Goal:
-A modular and scalable infrastructure.
-
-New Components:
-New HAProxy (Clustered with previous one): Increases high availability of load balancing. If one fails, the other takes over.
-
-Dedicated Servers:
-1 Web Server (Nginx)
-1 Application Server
-1 Database Server (MySQL)
-
-Purpose of Splitting:
-Web Server: Handles static files, reduces load on other components.
-App Server: Dedicated to processing logic, better performance.
-DB Server: Centralizes and optimizes database management.
-
-Why Add Each:
-Improves performance.
-Easier to maintain and scale.
-Better resource utilization.
+Simple web stack
 
 
+A user wants to access your website by entering www.foobar.com into their browser. Below is the step-by-step flow of how the web infrastructure processes the request:
+
+1. User's Request
+
+    User Action: The user types www.foobar.com into their browser and presses Enter.
+    DNS Resolution:
+        The browser sends a DNS query to resolve www.foobar.com.
+        The DNS server responds with the server's IP address: 8.8.8.8.
+
+2. Server Components
+
+Infrastructure Design:
+
+    Web Server (Nginx):
+        Acts as the entry point for all incoming HTTP/HTTPS requests.
+        It listens on port 80 for HTTP and port 443 for HTTPS.
+        Nginx is configured as a reverse proxy to forward requests to the application server.
+
+    Application Server:
+        Hosts the backend logic for the website (e.g., written in Python/Django, Node.js, PHP, etc.).
+        Communicates with the web server (Nginx) to process requests.
+
+    Application Files:
+        The codebase is stored on the server (e.g., HTML, CSS, JavaScript for frontend, backend logic files, etc.).
+        The application server reads these files to generate responses.
+
+    Database (MySQL):
+        Stores website data such as user information, blog posts, or product details.
+        The application server queries the database to fetch or update data as required.
+
+3. Flow of a Request
+
+    Step 1: DNS Lookup
+        The user's browser resolves www.foobar.com to 8.8.8.8.
+
+    Step 2: Web Server (Nginx)
+        The browser sends an HTTP/HTTPS request to 8.8.8.8.
+        Nginx receives the request and forwards it to the application server.
+
+    Step 3: Application Server
+        The application server processes the request by executing the backend logic.
+        It may fetch data from the MySQL database if needed.
+
+    Step 4: Database (MySQL)
+        The application server queries the MySQL database for required data.
+        The database responds with the requested data.
+
+    Step 5: Response
+        The application server uses the application files (codebase) to generate the appropriate response (HTML, JSON, etc.).
+        The response is sent back to Nginx.
+        Nginx forwards the response to the user's browser.
+
+    Step 6: User's Browser
+        The user's browser renders the response, displaying the website.
+
+SPOF (Single Point of Failure):
+
+    Issue: Since the entire infrastructure relies on a single server, if this server fails (e.g., due to hardware issues, power failure, or network outage), the entire website becomes inaccessible.
+    Impact: Users cannot access the website until the issue is resolved, leading to downtime and potential revenue loss.
+
+Downtime for Maintenance:
+
+    Issue: When performing maintenance tasks such as deploying new code or restarting the web server (Apache or Nginx), the website is temporarily unavailable.
+    Impact: Users experience disruptions or errors when trying to access the website during this period.
+
+Scalability:
+
+    Issue: A single server cannot handle high volumes of traffic effectively. If there is a sudden surge in traffic, the server may become overloaded, leading to slow performance or a crash.
+    Impact: Poor user experience and potential loss of visitors.
+
+Link to JPG: https://imgur.com/a/5SwNDHM
